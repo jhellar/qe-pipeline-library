@@ -8,6 +8,6 @@ def call(Map params) {
 
     sh """
     yq w -i deploy/operator.yaml spec.template.spec.containers[0].image ${containerImageName}
-    operator-sdk test local ./test/e2e --namespace ${namespace}
+    operator-sdk test local ./test/e2e --namespace ${namespace} --go-test-flags "-v"
     """
 }
