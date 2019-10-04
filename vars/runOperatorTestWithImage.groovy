@@ -13,7 +13,7 @@ def call(Map params) {
     if (namespacedManifest) {
         namespacedManifestFilename = "namespaced_manifest.yaml"
         sh """
-        for file in \$(find deploy -name "*" -not -path 'deploy/**/*' | grep -E 'service|role|operator'); 
+        for file in \$(find deploy -name "*" -not -path 'deploy/**/*' | grep -E 'service|role|operator');
         do
             echo '---' >> ${namespacedManifestFilename}
             cat \$file >> ${namespacedManifestFilename}
@@ -32,12 +32,17 @@ def call(Map params) {
         """
     }
 
-    sh """
-    yq w -i deploy/operator.yaml spec.template.spec.containers[0].image ${containerImageName}
-    operator-sdk test local ./test/e2e \
-        --namespace ${namespace} \
-        --namespaced-manifest ${namespacedManifestFilename} \
-        --global-manifest ${globalManifestFilename} \
-        --go-test-flags '-v'
-    """
+    List<String> e2eTestCommand = [
+        "operator-sdk test local ./test/e2e",
+        "--namespace ${namespace}",
+        "--namespaced-manifest ${namespacedManifestFilename}",
+        "--global-manifest ${globalManifestFilename}",
+        "--go-test-flags '-v'"
+    ]
+
+    if (containerImageName && containerImageName != "") {
+        e2eTestCommand.add("--image ${containerImageName}")
+    }
+
+    sh e2eTestCommand.join(" ")
 }
