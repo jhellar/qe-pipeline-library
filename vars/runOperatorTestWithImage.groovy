@@ -33,8 +33,12 @@ def call(Map params) {
     }
 
     sh """
-    yq w -i deploy/operator.yaml spec.template.spec.containers[0].image ${containerImageName}
+    yq w -v -i deploy/operator.yaml spec.template.spec.containers[0].image ${containerImageName}
+    echo \$?
+    git status
+    git diff deploy/operator.yaml
     operator-sdk test local ./test/e2e \
+        --image ${containerImageName} \
         --namespace ${namespace} \
         --namespaced-manifest ${namespacedManifestFilename} \
         --global-manifest ${globalManifestFilename} \
