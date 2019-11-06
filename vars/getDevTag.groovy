@@ -4,7 +4,7 @@ def call(String repoDir = '.') {
   dir(repoDir) {
     sh(returnStdout: true, script: '''
       git fetch origin
-      LATEST_VERSION=$(git tag -l --sort=version:refname | tail -n1)
+      LATEST_VERSION=$(git tag -l | sort -V | tail -n1)
       VERSION_PARTS=(`echo "$LATEST_VERSION" | tr "." "\\n"`)
       NEXT_VERSION=${VERSION_PARTS[0]}.$((${VERSION_PARTS[1]} + 1)).0
       NUM_COMMITS=$(git rev-list HEAD --count)
