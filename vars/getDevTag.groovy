@@ -10,6 +10,6 @@ def call(String repoDir = '.') {
       NUM_COMMITS=$(git rev-list HEAD --count)
       LAST_COMMIT=$(git rev-parse --short HEAD)
       echo $NEXT_VERSION-dev.$NUM_COMMITS.$LAST_COMMIT
-    ''')
+    ''').trim()
   }
 }
