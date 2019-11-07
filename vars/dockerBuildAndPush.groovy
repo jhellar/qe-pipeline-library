@@ -7,6 +7,7 @@ def call(Map params) {
     final String containerRegistryServerName = params.containerRegistryServerName
     final String containerImageName = params.containerImageName
     final String pathToDockerfile = params.pathToDockerfile
+    final String[] additionalNames = params.additionalNames
 
     withCredentials([usernamePassword(credentialsId: credentialsId, usernameVariable: 'registryUsername', passwordVariable: "registryPassword")]) {
         sh """
@@ -14,5 +15,14 @@ def call(Map params) {
         docker build -t ${containerImageName} -f ${pathToDockerfile} .
         docker push ${containerImageName}
         """
+        
+        if(additionalNames) {
+            additionalNames.each { name ->
+                sh """
+                docker tag ${containerImageName} ${name}
+                docker push ${name}
+                """
+            }
+        }
     }
 }
